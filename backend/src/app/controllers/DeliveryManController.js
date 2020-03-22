@@ -43,7 +43,7 @@ class DeliveryManController {
         {
           model: Avatar,
           as: 'avatar',
-          attributes: ['name', 'path', 'url'],
+          attributes: ['id', 'path', 'url'],
         },
       ],
     });
@@ -54,7 +54,16 @@ class DeliveryManController {
   async show(req, res) {
     const { id } = req.params;
 
-    const deliveryMans = await DeliveryMan.findByPk(id);
+    const deliveryMans = await DeliveryMan.findOne({
+      where: { id },
+      include: [
+        {
+          model: Avatar,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
+    });
 
     return res.json(deliveryMans);
   }

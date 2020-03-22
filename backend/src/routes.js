@@ -5,6 +5,7 @@ import multerConfig from './config/multer';
 import RecipientController from './app/controllers/RecipientController';
 import SessionController from './app/controllers/SessionController';
 import AvatarController from './app/controllers/AvatarController';
+import SignatureController from './app/controllers/SignatureController';
 import DeliveyManController from './app/controllers/DeliveryManController';
 import DeliveryController from './app/controllers/DeliveryController';
 import DeliveryStatusController from './app/controllers/DeliveryStatusController';
@@ -59,5 +60,6 @@ routes.get('/delivery/:id/problems', DeliveryProblemController.show);
 routes.put('/problem/:id/cancel-delivery', DeliveryProblemController.update);
 
 routes.post('/avatars', upload.single('file'), AvatarController.store);
+routes.post('/signatures', upload.single('file'), SignatureController.store);
 
 export default routes;

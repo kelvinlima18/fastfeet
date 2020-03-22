@@ -43,11 +43,20 @@ class DeliveryProblemController {
       offset: (page - 1) * quantity,
       where: id ? { id: { [Op.iLike]: `%${id}` } } : null,
       order: ['id'],
+      include: [
+        {
+          model: Delivery,
+          as: 'delivery',
+          attributes: ['id', 'status', 'start_date', 'end_date', 'canceled_at'],
+        },
+      ],
     });
 
     if (!deliverysProblem) {
       return res.status(400).json({ error: 'Deliverys problem not found' });
     }
+
+    if (deliverysProblem);
 
     return res.json(deliverysProblem);
   }

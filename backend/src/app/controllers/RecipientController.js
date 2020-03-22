@@ -24,12 +24,12 @@ class RecipientController {
   }
 
   async index(req, res) {
-    const { name, page = 1, quantity = 10 } = req.params;
+    const { name, page = 1, quantity = 10 } = req.query;
 
     const recipients = await Recipient.findAll({
       limit: quantity,
       offset: (page - 1) * quantity,
-      where: name ? { name: { [Op.iLike]: `%${name}` } } : null,
+      where: name ? { name: { [Op.iLike]: `%${name}%` } } : null,
       order: ['name'],
     });
 

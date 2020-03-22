@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import DeliveryMan from '../models/DeliveryMan';
+import Signature from '../models/Signature';
 
 import DeliveryMail from '../jobs/DeliveryMail';
 import Queue from '../../lib/Queue';
@@ -47,13 +48,44 @@ class DeliveryController {
   }
 
   async index(req, res) {
-    const { id, page = 1, quantity = 10 } = req.params;
+    const { product, page = 1, quantity = 10 } = req.query;
 
     const deliveries = await Delivery.findAll({
       limit: quantity,
       offset: (page - 1) * quantity,
-      where: id ? { id: { [Op.iLike]: `%${id}` } } : null,
+      where: { product: { [Op.iLike]: `%${product}%` } },
       order: ['id'],
+      include: [
+        {
+          model: DeliveryMan,
+          as: 'delivery_man',
+          attributes: ['id', 'name', 'email'],
+        },
+        {
+          model: Recipient,
+          as: 'recipient',
+          attributes: [
+            'id',
+            'name',
+            'street',
+            'number',
+            'complement',
+            'state',
+            'city',
+            'cep',
+          ],
+        },
+      ],
+    });
+
+    return res.json(deliveries);
+  }
+
+  async show(req, res) {
+    const { id } = req.params;
+
+    const deliveries = await Delivery.findOne({
+      where: { id },
       include: [
         {
           model: DeliveryMan,
@@ -73,23 +105,20 @@ class DeliveryController {
             'cep',
           ],
         },
+        {
+          model: Signature,
+          as: 'signature',
+          attributes: ['name', 'path', 'url'],
+        },
       ],
     });
 
     return res.json(deliveries);
   }
 
-  async show(req, res) {
-    const { id } = req.params;
-
-    const deliveries = await Delivery.findByPk(id);
-
-    return res.json(deliveries);
-  }
-
   async update(req, res) {
     const schema = Yup.object().shape({
-      delivery_id: Yup.number().required(),
+      deliveryman_id: Yup.number().required(),
       recipient_id: Yup.number().required(),
       product: Yup.string().required(),
     });
