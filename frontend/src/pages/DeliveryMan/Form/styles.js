@@ -72,6 +72,13 @@ export const Container = styled.div`
     flex-direction: column;
     margin-top: 20px;
 
+    img {
+      height: 150px;
+      width: 150px;
+      border-radius: 50%;
+      border: 3px dashed #ddd;
+    }
+
     span {
       font-size: 14px;
       font-weight: bold;

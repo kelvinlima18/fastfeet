@@ -26,19 +26,6 @@ export const MenuList = styled.ul`
   font-size: 16px;
   z-index: 5;
 
-  &::before {
-    content: '';
-    position: absolute;
-
-    left: calc(50% - 30px);
-    top: -10px;
-    height: 0;
-    width: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 10px solid #ddd;
-  }
-
   li {
     & + li {
       margin-top: 5px;

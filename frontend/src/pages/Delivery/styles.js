@@ -109,18 +109,13 @@ export const Table = styled.table`
         flex-direction: row;
         text-align: center;
         align-items: center;
-      }
 
-      .circle {
-        background: #ddd;
-        width: 35px;
-        height: 35px;
-        margin-right: 5px;
-        border-radius: 50%;
-        text-align: center;
-        padding: 7px;
-        color: #fff;
-        text-transform: uppercase;
+        img {
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          margin-right: 5px;
+        }
       }
     }
   }
@@ -145,5 +140,37 @@ export const Modal = styled(ReactModal).attrs(() => ({
 }))`
   span {
     font-weight: bold;
+  }
+
+  .dates {
+    display: flex;
+    flex-direction: column;
+  }
+
+  img {
+    height: 350px;
+    width: 400px;
+    border-radius: 5px;
+  }
+`;
+
+export const PageButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    background: #7d40e7;
+    border: none;
+    width: 120px;
+    height: 45px;
+    border-radius: 22px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.2s;
+
+    &:hover {
+      background: ${darken(0.08, '#7d40e7')};
+    }
   }
 `;

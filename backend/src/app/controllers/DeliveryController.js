@@ -54,7 +54,7 @@ class DeliveryController {
       limit: quantity,
       offset: (page - 1) * quantity,
       where: { product: { [Op.iLike]: `%${product}%` } },
-      order: ['id'],
+      order: [['created_at', 'DESC']],
       include: [
         {
           model: DeliveryMan,
@@ -74,6 +74,11 @@ class DeliveryController {
             'city',
             'cep',
           ],
+        },
+        {
+          model: Signature,
+          as: 'signature',
+          attributes: ['name', 'path', 'url'],
         },
       ],
     });

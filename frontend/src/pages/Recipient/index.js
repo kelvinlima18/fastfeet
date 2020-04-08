@@ -71,8 +71,8 @@ export default function Recipient() {
               <td>{`#${data.id}`}</td>
               <td>{data.name}</td>
               <td>{`${data.street}, ${data.number}${
-                data.complement ? ` - ${data.complement}` : null
-              }, ${data.city} - ${data.state}`}</td>
+                data.complement ? ` - ${data.complement}` : ''
+              } - ${data.city} - ${data.state}`}</td>
               <td>
                 <StatusMenu ariaHideApp={false}>
                   <li>

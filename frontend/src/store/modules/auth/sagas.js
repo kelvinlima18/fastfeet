@@ -19,8 +19,6 @@ export function* signIn({ payload }) {
 
     api.defaults.headers.Authorization = `Bearer ${token}`;
 
-    console.tron.log(history.state);
-
     yield put(signInSuccess(token, user_admin));
 
     history.push('/delivery');

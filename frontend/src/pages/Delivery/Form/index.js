@@ -3,11 +3,16 @@ import PropTypes from 'prop-types';
 import { MdKeyboardArrowLeft, MdDone } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { Form, Input } from '@rocketseat/unform';
+import * as Yup from 'yup';
 
 import api from '~/services/api';
 import history from '~/services/history';
 
 import { Container, Select } from './styles';
+
+const schema = Yup.object().shape({
+  product: Yup.string().required('O nome do produto é obrigatório'),
+});
 
 export default function DeliveryForm({ match }) {
   const [recipientSelect, setRecipientSelect] = useState([]);
@@ -58,8 +63,6 @@ export default function DeliveryForm({ match }) {
   }, [id]);
 
   async function handleSubmit(data) {
-    console.tron.log({ data, deliveryManSelect, recipientSelect });
-
     if (id) {
       await api
         .put(`/deliveries/${id}`, {
@@ -93,7 +96,7 @@ export default function DeliveryForm({ match }) {
 
   return (
     <Container>
-      <Form initialData={productSelect} onSubmit={handleSubmit}>
+      <Form schema={schema} initialData={productSelect} onSubmit={handleSubmit}>
         <header>
           <div>
             <strong>

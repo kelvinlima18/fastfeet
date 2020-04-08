@@ -102,7 +102,7 @@ export default function DeliveryMan() {
                   <li>
                     <button type="button">
                       <Link
-                        to="/delivery"
+                        to="/deliveryman"
                         onClick={() => handleRemove(data.id)}
                       >
                         <MdDeleteForever size={20} color="#DE3B3B" />

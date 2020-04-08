@@ -16,6 +16,7 @@ import Recipient from '../models/Recipient';
 class DeliveryStatusController {
   async index(req, res) {
     const { id } = req.params;
+    const { delivered } = req.query;
 
     const deliveryMan = await DeliveryMan.findByPk(id);
 
@@ -24,9 +25,21 @@ class DeliveryStatusController {
     }
 
     const deliveries = await Delivery.findAll({
-      where: { deliveryman_id: id, canceled_at: null, end_date: null },
+      where: {
+        deliveryman_id: id,
+        canceled_at: null,
+        end_date: delivered ? { [Op.ne]: null } : null,
+      },
       order: ['id'],
-      attributes: ['id', 'product'],
+      attributes: [
+        'id',
+        'product',
+        'createdAt',
+        'start_date',
+        'end_date',
+        'canceled_at',
+        'status',
+      ],
       include: [
         {
           model: Recipient,

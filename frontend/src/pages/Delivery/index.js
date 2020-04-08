@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import {
   MdAdd,
   MdSearch,
@@ -12,7 +13,7 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import api from '~/services/api';
 
-import { Container, Table, Modal } from './styles';
+import { Container, Table, Modal, PageButton } from './styles';
 import StatusMenu from '~/components/StatusMenu';
 import StatusColor from '~/components/StatusColor';
 
@@ -24,14 +25,30 @@ export default function Delivery() {
   const [signatureModal, setSignatureModal] = useState([]);
   const [product, setProduct] = useState('');
 
+  const [page, setPage] = useState(1);
+
   useEffect(() => {
     async function loadDelivery() {
-      const response = await api.get(`/deliveries?product=${product}`);
+      const response = await api.get(`/deliveries?product=${product}`, {
+        params: {
+          quantity: 5,
+          page,
+        },
+      });
 
-      setDelivery(response.data);
+      const data = response.data.map(check => ({
+        ...check,
+        initialName: check.delivery_man.name.replace(/\s/g, '+'),
+      }));
+
+      setDelivery(data);
     }
     loadDelivery();
-  }, [product]);
+  }, [product, page]);
+
+  function handlePage(action) {
+    return action === 'next' ? setPage(page + 1) : setPage(page - 1);
+  }
 
   function openModal(bool) {
     setIsOpen(bool);
@@ -56,8 +73,6 @@ export default function Delivery() {
         : null,
     };
 
-    console.tron.log(data.signature);
-
     setDeliveryModal(data);
     setRecipientModal(data.recipient);
     setSignatureModal(data.signature);
@@ -76,15 +91,6 @@ export default function Delivery() {
     }
   }
 
-  function initialName(fullName) {
-    fullName = fullName.replace(/\s(de|da|dos|das)\s/g, ' ');
-    const initials = fullName.match(/\b(\w)/gi);
-    const lastNames = initials
-      .splice(1, initials.length - 1)
-      .join('')
-      .toLowerCase();
-    return initials + lastNames;
-  }
   return (
     <Container>
       <header>
@@ -130,9 +136,10 @@ export default function Delivery() {
                 <td>{data.recipient.name}</td>
                 <td>
                   <div className="name">
-                    <div className="circle">
-                      {initialName(data.delivery_man.name)}
-                    </div>
+                    <img
+                      src={`https://ui-avatars.com/api/?size=140&background=f4effc&color=a28fd0&name=${data.initialName}`}
+                      alt={data.delivery_man.name}
+                    />
                     {data.delivery_man.name}
                   </div>
                 </td>
@@ -154,23 +161,39 @@ export default function Delivery() {
                       </button>
                     </li>
                     <li>
-                      <button type="button">
-                        <Link to={`/delivery-edit/${data.id}`}>
+                      {data.status === 'ENTREGUE' ||
+                      data.status === 'CANCELADA' ? (
+                        <button type="button" disabled>
                           <MdModeEdit size={20} color="#4D85EE" />
                           Editar
-                        </Link>
-                      </button>
+                        </button>
+                      ) : (
+                        <button type="button">
+                          <Link to={`/delivery-edit/${data.id}`}>
+                            <MdModeEdit size={20} color="#4D85EE" />
+                            Editar
+                          </Link>
+                        </button>
+                      )}
                     </li>
                     <li>
-                      <button type="button">
-                        <Link
-                          to="/delivery"
-                          onClick={() => handleRemove(data.id)}
-                        >
+                      {data.status === 'ENTREGUE' ||
+                      data.status === 'CANCELADA' ? (
+                        <button type="button" disabled>
                           <MdDeleteForever size={20} color="#DE3B3B" />
                           Excluir
-                        </Link>
-                      </button>
+                        </button>
+                      ) : (
+                        <button type="button">
+                          <Link
+                            to="/delivery"
+                            onClick={() => handleRemove(data.id)}
+                          >
+                            <MdDeleteForever size={20} color="#DE3B3B" />
+                            Excluir
+                          </Link>
+                        </button>
+                      )}
                     </li>
                   </StatusMenu>
                 </td>
@@ -185,6 +208,14 @@ export default function Delivery() {
           </tbody>
         )}
       </Table>
+      <PageButton>
+        <button type="button" onClick={() => handlePage('back')}>
+          Anterior
+        </button>
+        <button type="button" onClick={() => handlePage('next')}>
+          Próximo
+        </button>
+      </PageButton>
 
       <Modal
         isOpen={modalIsOpen}
@@ -193,19 +224,26 @@ export default function Delivery() {
       >
         <span>Informações da encomenda</span>
         <div>
-          {`${recipientModal.street}, ${recipientModal.number}`}
-          {`${recipientModal.city} - ${recipientModal.state}`}
+          <strong>{recipientModal.name}</strong>
+          <br />
+          {`${recipientModal.street}, ${recipientModal.number} - `}
+          {`${recipientModal.city} - ${recipientModal.state}, `}
           {recipientModal.cep}
         </div>
         <br />
         <span>Datas</span>
-        <div>
-          Retirada: {deliveryModal.formatedStartDate}
-          Entrega: {deliveryModal.formatedEndDate}
+        <div className="dates">
+          <div>Retirada: {deliveryModal.formatedStartDate}</div>
+          <div>Entrega: {deliveryModal.formatedEndDate}</div>
         </div>
         <br />
         <span>Assinatura do Destinatario</span>
-        <img src={signatureModal.url} alt="" />
+        <br />
+        {signatureModal === null ? (
+          <span> Encomenda não entregue </span>
+        ) : (
+          <img src={signatureModal.url} alt="" />
+        )}
       </Modal>
     </Container>
   );

@@ -1,10 +1,9 @@
-import Signature from '../models/Signature';
 import Delivery from '../models/Delivery';
 
 class DeliveryReceivedController {
-  async store(req, res) {
+  async update(req, res) {
     const { id, deliveries_id } = req.params;
-    const { originalname: name, filename: path } = req.file;
+    const { signature_id } = req.body;
 
     const delivery = await Delivery.findOne({
       where: {
@@ -17,13 +16,8 @@ class DeliveryReceivedController {
       return res.status(400).json({ error: 'Delivery not picked up' });
     }
 
-    const file = await Signature.create({
-      name,
-      path,
-    });
-
     await delivery.update({
-      signature_id: file.id,
+      signature_id,
       end_date: new Date(),
     });
 

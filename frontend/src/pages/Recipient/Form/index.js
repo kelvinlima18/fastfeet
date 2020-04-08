@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Form, Input } from '@rocketseat/unform';
 import { Link } from 'react-router-dom';
+import * as Yup from 'yup';
 
 import { MdKeyboardArrowLeft, MdDone } from 'react-icons/md';
+
 import api from '~/services/api';
+import history from '~/services/history';
 
 import { Container } from './styles';
+
+const schema = Yup.object().shape({
+  name: Yup.string().required('O nome é obrigatório'),
+  number: Yup.string().required(
+    'O numero é obrigatório. Caso não tenha número prencha com SN'
+  ),
+  city: Yup.string().required('O estado é obrigatório'),
+  state: Yup.string().required('A cidade é obrigatório'),
+  cep: Yup.string().required('O CEP é obrigatório'),
+});
 
 export default function RecipientForm({ match }) {
   const { id } = match.params;
@@ -19,7 +33,7 @@ export default function RecipientForm({ match }) {
     }
 
     loadRecipient();
-  }, []);
+  }, [id]);
 
   async function handleSubmit(data) {
     if (id) {
@@ -41,11 +55,16 @@ export default function RecipientForm({ match }) {
           console.tron.log(err.response);
         });
     }
+    history.push('/recipient');
   }
 
   return (
     <Container>
-      <Form initialData={id ? recipient : null} onSubmit={handleSubmit}>
+      <Form
+        schema={schema}
+        initialData={id ? recipient : null}
+        onSubmit={handleSubmit}
+      >
         <header>
           <div>
             <strong>
@@ -103,3 +122,11 @@ export default function RecipientForm({ match }) {
     </Container>
   );
 }
+
+RecipientForm.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.number,
+    }).isRequired,
+  }).isRequired,
+};

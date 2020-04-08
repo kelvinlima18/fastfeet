@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import { Form, Input } from '@rocketseat/unform';
 import { Link } from 'react-router-dom';
+import * as Yup from 'yup';
+
 import { MdKeyboardArrowLeft, MdDone } from 'react-icons/md';
 
 import api from '~/services/api';
@@ -8,10 +12,21 @@ import history from '~/services/history';
 
 import { Container } from './styles';
 
-import AvatarInput from '../AVatarInput';
+import { updateDeliveryManRequest } from '~/store/modules/deliveryMan/actions';
+
+import AvatarInput from '../AvatarInput';
+
+const schema = Yup.object().shape({
+  nome: Yup.string().required('O nome é obrigatório'),
+  email: Yup.string()
+    .email('Insira um e-manil valido')
+    .required('O e-mail é obrigatório'),
+});
 
 export default function DeliveryManForm({ match }) {
   const [deliveryMan, setDeliveryMan] = useState([]);
+  const [avatar, setAvatar] = useState([]);
+  const dispatch = useDispatch();
   const { id } = match.params;
 
   useEffect(() => {
@@ -19,20 +34,24 @@ export default function DeliveryManForm({ match }) {
       const response = await api.get(`deliverymans/${id}`);
 
       setDeliveryMan(response.data);
+      setAvatar(response.data.avatar);
     }
 
     loadDeliveryMan();
-  }, [deliveryMan]);
+  }, [id]);
 
   async function handleSubmit(data) {
     const { name, email, avatar_id } = data;
 
+    const dataState = {
+      id,
+      name,
+      email,
+      avatar_id,
+    };
+
     if (id) {
-      await api.put(`/deliverymans/${id}`, {
-        name,
-        email,
-        avatar_id,
-      });
+      dispatch(updateDeliveryManRequest(dataState));
       history.push('/deliveryman');
     } else {
       await api.post('/deliverymans', {
@@ -43,11 +62,16 @@ export default function DeliveryManForm({ match }) {
 
       history.push('/deliveryman');
     }
+    document.location.reload(true);
   }
 
   return (
     <Container>
-      <Form initialData={id ? deliveryMan : null} onSubmit={handleSubmit}>
+      <Form
+        schema={schema}
+        initialData={id ? deliveryMan : null}
+        onSubmit={handleSubmit}
+      >
         <header>
           <div>
             <strong>
@@ -68,7 +92,7 @@ export default function DeliveryManForm({ match }) {
           </div>
         </header>
         <div className="form">
-          <AvatarInput name="avatar_id" />
+          <AvatarInput avatar={avatar.url} name="avatar_id" />
           <span>Nome</span>
           <Input name="name" type="text" />
           <span>Email</span>
@@ -78,3 +102,11 @@ export default function DeliveryManForm({ match }) {
     </Container>
   );
 }
+
+DeliveryManForm.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.number,
+    }).isRequired,
+  }).isRequired,
+};

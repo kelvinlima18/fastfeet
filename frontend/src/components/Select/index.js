@@ -7,7 +7,7 @@ import { Label, Container } from './styles';
 
 export default function SelectInput({ name, label, ...rest }) {
   const selectRef = useRef(null);
-  const { fieldName, defaultValue, registerField, error } = useField(name);
+  const { fieldName, defaultValue, registerField } = useField(name);
 
   useEffect(() => {
     registerField({
@@ -42,6 +42,7 @@ export default function SelectInput({ name, label, ...rest }) {
   );
 }
 
-Select.propTypes = {
+SelectInput.propTypes = {
   name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
 };

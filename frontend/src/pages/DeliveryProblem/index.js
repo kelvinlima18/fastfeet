@@ -4,7 +4,6 @@ import { MdRemoveRedEye, MdDeleteForever } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
 import api from '~/services/api';
-import history from '~/services/history';
 
 import { Container, Table, Modal } from './styles';
 import StatusMenu from '~/components/StatusMenu';
@@ -17,8 +16,6 @@ export default function DeliveryProblem() {
   useEffect(() => {
     async function loadProblem() {
       const response = await api.get(`delivery/problems`);
-
-      console.tron.log(response.data);
 
       setProblem(response.data);
     }
@@ -36,8 +33,6 @@ export default function DeliveryProblem() {
 
   async function handleShow(id) {
     const response = await api.get(`/delivery/${id}/problems`);
-
-    console.tron.log(response.data);
 
     setProblemModal(response.data);
     openModal(true);
@@ -98,15 +93,22 @@ export default function DeliveryProblem() {
                     </button>
                   </li>
                   <li>
-                    <button type="button">
-                      <Link
-                        to="/delivery-problem"
-                        onClick={() => handleRemove(data.id)}
-                      >
+                    {data.delivery.status === 'CANCELADA' ? (
+                      <button type="button" disabled>
                         <MdDeleteForever size={20} color="#DE3B3B" />
                         Cancelar encomenda
-                      </Link>
-                    </button>
+                      </button>
+                    ) : (
+                      <button type="button">
+                        <Link
+                          to="/delivery-problem"
+                          onClick={() => handleRemove(data.id)}
+                        >
+                          <MdDeleteForever size={20} color="#DE3B3B" />
+                          Cancelar encomenda
+                        </Link>
+                      </button>
+                    )}
                   </li>
                 </StatusMenu>
               </td>
